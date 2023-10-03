@@ -1,8 +1,8 @@
 package com.booking.roome.service.Impl;
 
 import com.booking.roome.dto.roleDto;
-import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.exception.ExceptionResponse;
+import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.model.Role;
 import com.booking.roome.repository.RoleRepository;
 import com.booking.roome.service.RoleService;
@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
     }
     @Override
     public ResponseEntity<?> getRole(Integer id) {
-        Role role = roleRepo.findById(id).orElseThrow(() -> new ExceptionRequest("Role not found", HttpStatus.NOT_FOUND));
+        Role role = roleRepo.findById(id).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
 
         return ResponseEntity.ok(role);
     }
@@ -44,13 +44,13 @@ public class RoleServiceImpl implements RoleService {
             try {
                 roleRepo.save(role);
             }catch (Exception e) {
-                throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+                throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
 
             return ResponseEntity.ok(role);
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse("Role already exist", HttpStatus.BAD_REQUEST.value()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionRequest("Role already exist", HttpStatus.BAD_REQUEST.value()));
     }
 
     @Override
@@ -60,14 +60,14 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public ResponseEntity<?> update(Role role, int id) {
-        Role oldRole = roleRepo.findById(id).orElseThrow(() -> new ExceptionRequest("Role not found", HttpStatus.NOT_FOUND));
+        Role oldRole = roleRepo.findById(id).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
 
         oldRole.setName(role.getName().toLowerCase());
 
         try {
             roleRepo.save(oldRole);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(role);
@@ -75,14 +75,14 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        Role role = roleRepo.findById(id).orElseThrow(() -> new ExceptionRequest("Role not found", HttpStatus.NOT_FOUND));
+        Role role = roleRepo.findById(id).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
 
         try {
             roleRepo.delete(role);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok(new ExceptionResponse("Role deleted successfully", HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ExceptionRequest("Role deleted successfully", HttpStatus.OK.value()));
     }
 }

@@ -1,8 +1,8 @@
 package com.booking.roome.service.Impl;
 
 import com.booking.roome.dto.facilityDto;
-import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.exception.ExceptionResponse;
+import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.model.Facility;
 import com.booking.roome.repository.FacilityRepository;
 import com.booking.roome.service.FacilityService;
@@ -29,7 +29,7 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     public ResponseEntity<?> getFacility(int id) {
-        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Facility not found", HttpStatus.NOT_FOUND));
+        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Facility not found", HttpStatus.NOT_FOUND));
 
         return ResponseEntity.status(HttpStatus.OK).body(facility);
     }
@@ -42,7 +42,7 @@ public class FacilityServiceImpl implements FacilityService {
         try {
             facilityRepository.save(newFacility);
         }catch (RuntimeException e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(facility);
@@ -50,14 +50,14 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     public ResponseEntity<?> updateFacility(facilityDto updatedFacility, int id) {
-        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Facility not found", HttpStatus.NOT_FOUND));
+        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Facility not found", HttpStatus.NOT_FOUND));
 
         facility.setName(updatedFacility.getName());
 
         try {
             facilityRepository.save(facility);
         }catch (RuntimeException e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(facility);
@@ -65,14 +65,14 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     public ResponseEntity<?> deleteFacility(int id) {
-        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Facility not found", HttpStatus.NOT_FOUND));
+        Facility facility = facilityRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Facility not found", HttpStatus.NOT_FOUND));
 
         try {
             facilityRepository.delete(facility);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok(new ExceptionResponse("Facility deleted successfully", HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ExceptionRequest("Facility deleted successfully", HttpStatus.OK.value()));
     }
 }

@@ -1,7 +1,7 @@
 package com.booking.roome.service.Impl;
 
 import com.booking.roome.dto.loginDto;
-import com.booking.roome.exception.ExceptionResponse;
+import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.model.User;
 import com.booking.roome.repository.UserRepository;
 import com.booking.roome.service.AuthService;
@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ExceptionResponse("Username or password incorrect", HttpStatus.NOT_FOUND.value())
+                new ExceptionRequest("Username or password incorrect", HttpStatus.NOT_FOUND.value())
         );
     }
 }

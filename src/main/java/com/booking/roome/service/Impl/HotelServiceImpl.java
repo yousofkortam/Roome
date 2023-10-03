@@ -1,8 +1,8 @@
 package com.booking.roome.service.Impl;
 
 import com.booking.roome.dto.hotelDto;
-import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.exception.ExceptionResponse;
+import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.model.Facility;
 import com.booking.roome.model.Hotel;
 import com.booking.roome.model.User;
@@ -38,14 +38,14 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public ResponseEntity<?> getHotel(int id) {
-        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Hotel not found", HttpStatus.NOT_FOUND));
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Hotel not found", HttpStatus.NOT_FOUND));
 
         return ResponseEntity.status(HttpStatus.OK).body(hotel);
     }
 
     @Override
     public ResponseEntity<?> addHotel(hotelDto hotel) {
-        User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionRequest("Admin not found", HttpStatus.NOT_FOUND));
+        User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
 
         Hotel newHotel = new Hotel();
         newHotel.setName(hotel.getName());
@@ -64,7 +64,7 @@ public class HotelServiceImpl implements HotelService {
         try {
             hotelRepository.save(newHotel);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(newHotel);
@@ -72,9 +72,9 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public ResponseEntity<?> updateHotel(hotelDto hotel, int id) {
-        Hotel oldHotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Hotel not found", HttpStatus.NOT_FOUND));
+        Hotel oldHotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Hotel not found", HttpStatus.NOT_FOUND));
 
-        User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionRequest("Admin not found", HttpStatus.NOT_FOUND));
+        User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
 
         oldHotel.setName(hotel.getName());
         oldHotel.setAdmin(admin);
@@ -91,7 +91,7 @@ public class HotelServiceImpl implements HotelService {
         try {
             hotelRepository.save(oldHotel);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(oldHotel);
@@ -99,16 +99,16 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public ResponseEntity<?> deleteHotel(int id) {
-        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionRequest("Hotel not found", HttpStatus.NOT_FOUND));
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Hotel not found", HttpStatus.NOT_FOUND));
 
         try {
             hotelRepository.delete(hotel);
         }catch (Exception e) {
-            throw new ExceptionRequest(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ExceptionResponse("Hotel deleted successfully", HttpStatus.OK.value())
+                new ExceptionRequest("Hotel deleted successfully", HttpStatus.OK.value())
         );
     }
 }

@@ -1,14 +1,14 @@
 package com.booking.roome.exception;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
-@Data
-public class ExceptionResponse {
-    private String message;
-    private int status;
-
-    public ExceptionResponse(String message, int status) {
-        this.message = message;
+@Getter @Setter
+public class ExceptionResponse extends RuntimeException {
+    private HttpStatus status;
+    public ExceptionResponse(String message, HttpStatus status) {
+        super(message);
         this.status = status;
     }
 }
