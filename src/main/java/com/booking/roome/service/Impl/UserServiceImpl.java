@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepo;
     private final HotelRepository hotelRepo;
     private final ReservationRepository reservationRepository;
-
     private final UserMapper userMapper;
 
     @Autowired
