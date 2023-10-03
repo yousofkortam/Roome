@@ -3,6 +3,7 @@ package com.booking.roome.service.Impl;
 import com.booking.roome.dto.roleDto;
 import com.booking.roome.exception.ExceptionResponse;
 import com.booking.roome.exception.ExceptionRequest;
+import com.booking.roome.mapper.RoleMapper;
 import com.booking.roome.model.Role;
 import com.booking.roome.repository.RoleRepository;
 import com.booking.roome.service.RoleService;
@@ -17,11 +18,14 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepo;
+    private final RoleMapper roleMapper;
 
 
     @Autowired
-    public RoleServiceImpl(RoleRepository roleRepo) {
+    public RoleServiceImpl(RoleRepository roleRepo,
+                           RoleMapper roleMapper) {
         this.roleRepo = roleRepo;
+        this.roleMapper = roleMapper;
     }
 
     private boolean isRoleFound(String name) {
@@ -38,8 +42,7 @@ public class RoleServiceImpl implements RoleService {
     public ResponseEntity<?> add(roleDto newRole) {
         boolean isExist = isRoleFound(newRole.getName().toLowerCase());
         if (!isExist) {
-            Role role = new Role();
-            role.setName(newRole.getName().toLowerCase());
+            Role role = roleMapper.toEntity(newRole);
 
             try {
                 roleRepo.save(role);
@@ -74,7 +77,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public ResponseEntity<?> delete(Integer id) {
+    public ResponseEntity<?> delete(int id) {
         Role role = roleRepo.findById(id).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
 
         try {

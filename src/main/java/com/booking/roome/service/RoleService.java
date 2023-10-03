@@ -11,5 +11,5 @@ public interface RoleService {
     ResponseEntity<?> getRole(Integer id);
     ResponseEntity<?> add(roleDto newRole);
     ResponseEntity<?> update(Role role, int id);
-    ResponseEntity<?> delete(Integer id);
+    ResponseEntity<?> delete(int id);
 }

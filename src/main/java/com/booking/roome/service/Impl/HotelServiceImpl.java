@@ -3,6 +3,7 @@ package com.booking.roome.service.Impl;
 import com.booking.roome.dto.hotelDto;
 import com.booking.roome.exception.ExceptionResponse;
 import com.booking.roome.exception.ExceptionRequest;
+import com.booking.roome.mapper.HotelMapper;
 import com.booking.roome.model.Facility;
 import com.booking.roome.model.Hotel;
 import com.booking.roome.model.User;
@@ -21,14 +22,19 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final UserRepository userRepository;
     private final FacilityRepository facilityRepository;
+    private final HotelMapper hotelMapper;
 
 
 
     @Autowired
-    public HotelServiceImpl(HotelRepository hotelRepository, UserRepository userRepository, FacilityRepository facilityRepository) {
+    public HotelServiceImpl(HotelRepository hotelRepository,
+                            UserRepository userRepository,
+                            FacilityRepository facilityRepository,
+                            HotelMapper hotelMapper) {
         this.hotelRepository = hotelRepository;
         this.userRepository = userRepository;
         this.facilityRepository = facilityRepository;
+        this.hotelMapper = hotelMapper;
     }
 
     @Override
@@ -47,14 +53,8 @@ public class HotelServiceImpl implements HotelService {
     public ResponseEntity<?> addHotel(hotelDto hotel) {
         User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
 
-        Hotel newHotel = new Hotel();
-        newHotel.setName(hotel.getName());
+        Hotel newHotel = hotelMapper.toEntity(hotel);
         newHotel.setAdmin(admin);
-        newHotel.setDescription(hotel.getDescription());
-        newHotel.setLocation(hotel.getLocation());
-        newHotel.setRate(hotel.getRate());
-        newHotel.setPrice(hotel.getPrice());
-        newHotel.setNumberRooms(hotel.getNumberRooms());
         List<Facility> facilities = facilityRepository.findAllById(hotel.getFacilities());
 
         for (Facility facility : facilities) {
