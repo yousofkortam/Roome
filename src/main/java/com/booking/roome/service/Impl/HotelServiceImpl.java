@@ -111,4 +111,9 @@ public class HotelServiceImpl implements HotelService {
                 new ExceptionRequest("Hotel deleted successfully", HttpStatus.OK.value())
         );
     }
+
+    @Override
+    public List<Hotel> search(String name) {
+        return hotelRepository.findByNameContaining(name);
+    }
 }

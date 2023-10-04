@@ -44,4 +44,9 @@ public class hotelController {
     public ResponseEntity<?> deleteHotel(@PathVariable int id) {
         return hotelService.deleteHotel(id);
     }
+
+    @GetMapping("/search/{name}")
+    public List<Hotel> searchHotel(@PathVariable String name) {
+        return hotelService.search(name);
+    }
 }

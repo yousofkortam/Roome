@@ -12,4 +12,5 @@ public interface HotelService {
     ResponseEntity<?> addHotel(hotelDto hotel);
     ResponseEntity<?> updateHotel(hotelDto hotel, int id);
     ResponseEntity<?> deleteHotel(int id);
+    List<Hotel> search(String name);
 }
