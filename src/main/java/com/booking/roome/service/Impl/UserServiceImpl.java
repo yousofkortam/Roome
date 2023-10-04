@@ -153,6 +153,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void SaveUserOrElseThrow(userDto newUser) {
+
+        if (userRepo.existsByUsername(newUser.getUsername())) throw new ExceptionResponse("Username already in user", HttpStatus.BAD_REQUEST);
+        if (userRepo.existsByEmail(newUser.getEmail())) throw new ExceptionResponse("Email already in user", HttpStatus.BAD_REQUEST);
+
         Role role;
         if (newUser.getRole_id() == 0) {
             role = roleRepo.findByName("user");

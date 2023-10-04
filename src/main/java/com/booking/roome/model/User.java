@@ -35,10 +35,12 @@ public class User {
 
     @NotEmpty(message = "Username required")
     @NotNull(message = "Username required")
+    @Column(unique = true)
     private String username;
 
     @NotEmpty(message = "Email required")
     @NotNull(message = "Email required")
+    @Column(unique = true)
     private String email;
 
     @NotEmpty(message = "Password required")
