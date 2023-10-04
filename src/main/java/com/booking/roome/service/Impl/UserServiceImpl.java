@@ -152,10 +152,16 @@ public class UserServiceImpl implements UserService {
         return numberOfReservation < totalNumberOfRooms;
     }
 
-    private void SaveUserOrElseThrow(userDto newUser) {
+    int isUserExist(String username, String email) {
+        if (userRepo.existsByUsername(username)) return 1;
+        if (userRepo.existsByEmail(email)) return 2;
+        return 3;
+    }
 
-        if (userRepo.existsByUsername(newUser.getUsername())) throw new ExceptionResponse("Username already in user", HttpStatus.BAD_REQUEST);
-        if (userRepo.existsByEmail(newUser.getEmail())) throw new ExceptionResponse("Email already in user", HttpStatus.BAD_REQUEST);
+    private void SaveUserOrElseThrow(userDto newUser) {
+        int isExist = isUserExist(newUser.getUsername(), newUser.getEmail());
+        if (isExist == 1) throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
+        if (isExist == 2) throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
 
         Role role;
         if (newUser.getRole_id() == 0) {
