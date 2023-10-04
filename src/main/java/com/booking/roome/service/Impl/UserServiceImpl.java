@@ -163,8 +163,8 @@ public class UserServiceImpl implements UserService {
         if (isExist == 1) throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
         if (isExist == 2) throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
 
-        Role role;
-        if (newUser.getRole_id() == 0) {
+        Role role = roleRepo.findById(newUser.getRole_id()).orElse(null);
+        if (role == null) {
             role = roleRepo.findByName("user");
         }else {
             role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
