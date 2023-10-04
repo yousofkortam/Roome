@@ -153,7 +153,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private void SaveUserOrElseThrow(userDto newUser) {
-        Role role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
+        Role role;
+        if (newUser.getRole_id() == 0) {
+            role = roleRepo.findByName("user");
+        }else {
+            role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
+        }
 
         User user = userMapper.toEntity(newUser);
         user.setRole(role);
