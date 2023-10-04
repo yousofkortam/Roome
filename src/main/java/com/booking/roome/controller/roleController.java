@@ -3,6 +3,7 @@ package com.booking.roome.controller;
 import com.booking.roome.dto.roleDto;
 import com.booking.roome.model.Role;
 import com.booking.roome.service.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +31,12 @@ public class roleController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addRole(@RequestBody roleDto newRole) {
+    public ResponseEntity<?> addRole(@Valid @RequestBody roleDto newRole) {
         return roleService.add(newRole);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRole(@RequestBody Role role, @PathVariable int id) {
+    public ResponseEntity<?> updateRole(@Valid @RequestBody Role role, @PathVariable int id) {
         return ResponseEntity.ok(roleService.update(role, id));
     }
 

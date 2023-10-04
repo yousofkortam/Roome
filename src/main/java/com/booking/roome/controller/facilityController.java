@@ -3,6 +3,7 @@ package com.booking.roome.controller;
 import com.booking.roome.dto.facilityDto;
 import com.booking.roome.model.Facility;
 import com.booking.roome.service.FacilityService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,12 @@ public class facilityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> AddFacility(@RequestBody facilityDto facility) {
+    public ResponseEntity<?> AddFacility(@Valid @RequestBody facilityDto facility) {
         return facilityService.addFacility(facility);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFacility(@RequestBody facilityDto facilityDto, @PathVariable int id) {
+    public ResponseEntity<?> updateFacility(@Valid @RequestBody facilityDto facilityDto, @PathVariable int id) {
         return facilityService.updateFacility(facilityDto, id);
     }
 

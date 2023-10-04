@@ -3,6 +3,7 @@ package com.booking.roome.controller;
 import com.booking.roome.dto.hotelDto;
 import com.booking.roome.model.Hotel;
 import com.booking.roome.service.HotelService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +31,12 @@ public class hotelController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addHotel(@RequestBody hotelDto hotel) {
+    public ResponseEntity<?> addHotel(@Valid @RequestBody hotelDto hotel) {
         return hotelService.addHotel(hotel);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHotel(@RequestBody hotelDto hotel, @PathVariable int id) {
+    public ResponseEntity<?> updateHotel(@Valid @RequestBody hotelDto hotel, @PathVariable int id) {
         return hotelService.updateHotel(hotel, id);
     }
 

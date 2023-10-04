@@ -2,6 +2,8 @@ package com.booking.roome.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +22,19 @@ public class Hotel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+
+    @NotEmpty(message = "Hotel name required")
+    @NotNull(message = "Hotel name required")
     private String name;
 
+
+    @NotEmpty(message = "Hotel description required")
+    @NotNull(message = "Hotel description required")
     private String description;
 
+
+    @NotEmpty(message = "Hotel location required")
+    @NotNull(message = "Hotel location required")
     private String location;
 
     private Float rate;

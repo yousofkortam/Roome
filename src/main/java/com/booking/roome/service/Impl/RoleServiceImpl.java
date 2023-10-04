@@ -40,6 +40,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public ResponseEntity<?> add(roleDto newRole) {
+        if (newRole.getName() == null) newRole.setName("");
         boolean isExist = isRoleFound(newRole.getName().toLowerCase());
         if (!isExist) {
             Role role = roleMapper.toEntity(newRole);

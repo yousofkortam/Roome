@@ -4,6 +4,7 @@ import com.booking.roome.dto.reservationDto;
 import com.booking.roome.dto.userDto;
 import com.booking.roome.model.User;
 import com.booking.roome.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,12 @@ public class userController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addUser(@RequestBody userDto user) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody userDto user) {
         return userService.addUser(user);
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUser(@RequestBody userDto user) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody userDto user) {
         return userService.updateUser(user);
     }
 
