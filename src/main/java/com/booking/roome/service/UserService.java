@@ -2,6 +2,7 @@ package com.booking.roome.service;
 
 import com.booking.roome.dto.reservationDto;
 import com.booking.roome.dto.userDto;
+import com.booking.roome.model.Hotel;
 import com.booking.roome.model.User;
 import org.springframework.http.ResponseEntity;
 
@@ -17,4 +18,5 @@ public interface UserService {
     ResponseEntity<?> addHotelToFavorites(int userId, int hotelId);
     ResponseEntity<?> removeHotelFromFavorites(int userId, int hotelId);
     ResponseEntity<?> bookHotel(reservationDto reservation);
+    List<Hotel> getFavByUserId(int id);
 }

@@ -146,6 +146,12 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(new ExceptionRequest("Booked successfully", HttpStatus.OK.value()));
     }
 
+    @Override
+    public List<Hotel> getFavByUserId(int id) {
+        User user = userRepo.findById(id).orElseThrow(() -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND));
+        return user.getFavorites();
+    }
+
     private boolean canBookThisHotel(Hotel hotel) {
         int totalNumberOfRooms = hotel.getNumberRooms();
         int numberOfReservation = hotel.getReservations().size();

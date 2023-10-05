@@ -2,6 +2,7 @@ package com.booking.roome.controller;
 
 import com.booking.roome.dto.reservationDto;
 import com.booking.roome.dto.userDto;
+import com.booking.roome.model.Hotel;
 import com.booking.roome.model.User;
 import com.booking.roome.service.UserService;
 import jakarta.validation.Valid;
@@ -42,6 +43,11 @@ public class userController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id) {
         return userService.deleteUser(id);
+    }
+
+    @GetMapping("/fav/{id}")
+    public List<Hotel> getFavoritesByUserId(@PathVariable int id) {
+        return userService.getFavByUserId(id);
     }
 
     @PostMapping("/add-to-fav/{userId}/hotel/{hotelId}")
