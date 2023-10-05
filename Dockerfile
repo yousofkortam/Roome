@@ -6,7 +6,7 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim AS runtime
 WORKDIR /app
-COPY --from=build /app/Jar/Roome-0.0.1-SNAPSHOT.jar demo.jar
+COPY --from=build /Jar/Roome-0.0.1-SNAPSHOT.jar demo.jar
 
 FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
