@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -70,10 +71,9 @@ public class HotelServiceImpl implements HotelService {
             newHotel.addFacility(facility);
         }
 
-        List<Image> images;
+        List<Image> images = uploadImage(File);
 
-        if (!(File.length > 0)) {
-            images = uploadImage(File);
+        if (!images.isEmpty()) {
             newHotel.addAllImages(images);
         }
 
@@ -93,16 +93,16 @@ public class HotelServiceImpl implements HotelService {
         for (MultipartFile file : File) {
             try {
 
-                if (file.isEmpty()) {
-                    throw new ExceptionResponse("Please select a file to upload.", HttpStatus.BAD_REQUEST);
-                }
+                String originalFilename = file.getOriginalFilename();
+                String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
+                String filename = (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
 
                 byte[] bytes = file.getBytes();
-                Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+                Path path = Paths.get(UPLOADED_FOLDER + filename);
                 Files.write(path, bytes);
 
                 Image image = new Image();
-                image.setPath(UPLOADED_FOLDER + file.getOriginalFilename()); image.setName(file.getOriginalFilename());
+                image.setPath(UPLOADED_FOLDER + filename); image.setName(file.getOriginalFilename());
                 images.add(image);
 
             } catch (Exception e) {
