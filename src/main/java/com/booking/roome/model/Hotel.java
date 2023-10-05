@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +52,43 @@ public class Hotel {
 
     @ManyToMany
     @JoinTable(
+            name = "hotel_image",
+            joinColumns = @JoinColumn(name = "hotel_id"),
+            inverseJoinColumns = @JoinColumn(name = "image_id")
+    )
+    private List<Image> images;
+
+    @ManyToMany
+    @JoinTable(
             name = "hotel_facilities",
             joinColumns = @JoinColumn(name = "hotel_id"),
             inverseJoinColumns = @JoinColumn(name = "facility_id")
     )
-    private List<Facility> facilities = new ArrayList<>();
+    private List<Facility> facilities;
 
     @JsonIgnore
     @OneToMany(mappedBy = "hotel")
-    private List<Reservation> reservations = new ArrayList<>();
+    private List<Reservation> reservations;
 
 
     public void addFacility(Facility facility) {
+        if (facilities == null) {
+            facilities = new ArrayList<>();
+        }
         facilities.add(facility);
+    }
+
+    public void addImage(Image image) {
+        if (images == null) {
+            images = new ArrayList<>();
+        }
+        images.add(image);
+    }
+
+    public void addAllImages(List<Image> newImages) {
+        if (images == null) {
+            images = new ArrayList<>();
+        }
+        images.addAll(newImages);
     }
 }

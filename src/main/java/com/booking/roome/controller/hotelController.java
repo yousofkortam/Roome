@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,13 +32,13 @@ public class hotelController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addHotel(@Valid @RequestBody hotelDto hotel) {
-        return hotelService.addHotel(hotel);
+    public ResponseEntity<?> addHotel(@Valid @RequestPart("hotel") hotelDto hotel, @RequestPart("files") MultipartFile[] files) {
+        return hotelService.addHotel(hotel, files);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHotel(@Valid @RequestBody hotelDto hotel, @PathVariable int id) {
-        return hotelService.updateHotel(hotel, id);
+    public ResponseEntity<?> updateHotel(@Valid @RequestPart("hotel") hotelDto hotel, @PathVariable int id, @RequestPart("files") MultipartFile[] files) {
+        return hotelService.updateHotel(hotel, id, files);
     }
 
     @DeleteMapping("/{id}")

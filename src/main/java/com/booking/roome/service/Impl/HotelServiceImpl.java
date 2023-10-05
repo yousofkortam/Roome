@@ -6,6 +6,7 @@ import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.mapper.HotelMapper;
 import com.booking.roome.model.Facility;
 import com.booking.roome.model.Hotel;
+import com.booking.roome.model.Image;
 import com.booking.roome.model.User;
 import com.booking.roome.repository.*;
 import com.booking.roome.service.HotelService;
@@ -13,7 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +29,7 @@ public class HotelServiceImpl implements HotelService {
     private final UserRepository userRepository;
     private final FacilityRepository facilityRepository;
     private final HotelMapper hotelMapper;
+    private final ImageRepository imageRepository;
 
 
 
@@ -30,11 +37,13 @@ public class HotelServiceImpl implements HotelService {
     public HotelServiceImpl(HotelRepository hotelRepository,
                             UserRepository userRepository,
                             FacilityRepository facilityRepository,
-                            HotelMapper hotelMapper) {
+                            HotelMapper hotelMapper,
+                            ImageRepository imageRepository) {
         this.hotelRepository = hotelRepository;
         this.userRepository = userRepository;
         this.facilityRepository = facilityRepository;
         this.hotelMapper = hotelMapper;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -50,7 +59,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public ResponseEntity<?> addHotel(hotelDto hotel) {
+    public ResponseEntity<?> addHotel(hotelDto hotel, MultipartFile[] File) {
         User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
 
         Hotel newHotel = hotelMapper.toEntity(hotel);
@@ -59,6 +68,13 @@ public class HotelServiceImpl implements HotelService {
 
         for (Facility facility : facilities) {
             newHotel.addFacility(facility);
+        }
+
+        List<Image> images;
+
+        if (!(File.length > 0)) {
+            images = uploadImage(File);
+            newHotel.addAllImages(images);
         }
 
         try {
@@ -70,8 +86,35 @@ public class HotelServiceImpl implements HotelService {
         return ResponseEntity.status(HttpStatus.OK).body(newHotel);
     }
 
+    private List<Image> uploadImage(MultipartFile[] File) {
+        String UPLOADED_FOLDER = "src/main/resources/static/images/";
+        List<Image> images = new ArrayList<>();
+
+        for (MultipartFile file : File) {
+            try {
+
+                if (file.isEmpty()) {
+                    throw new ExceptionResponse("Please select a file to upload.", HttpStatus.BAD_REQUEST);
+                }
+
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+                Files.write(path, bytes);
+
+                Image image = new Image();
+                image.setPath(UPLOADED_FOLDER + file.getOriginalFilename()); image.setName(file.getOriginalFilename());
+                images.add(image);
+
+            } catch (Exception e) {
+                throw new ExceptionResponse("Failed to upload file", HttpStatus.BAD_REQUEST);
+            }
+        }
+        imageRepository.saveAll(images);
+        return images;
+    }
+
     @Override
-    public ResponseEntity<?> updateHotel(hotelDto hotel, int id) {
+    public ResponseEntity<?> updateHotel(hotelDto hotel, int id, MultipartFile[] files) {
         Hotel oldHotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Hotel not found", HttpStatus.NOT_FOUND));
 
         User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
@@ -83,6 +126,9 @@ public class HotelServiceImpl implements HotelService {
         oldHotel.setRate(hotel.getRate());
         oldHotel.setPrice(hotel.getPrice());
         oldHotel.setNumberRooms(hotel.getNumberRooms());
+
+        List<Image> images = uploadImage(files);
+        oldHotel.setImages(images);
 
         List<Facility> facilities = facilityRepository.findAllById(hotel.getFacilities());
 

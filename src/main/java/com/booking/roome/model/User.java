@@ -59,7 +59,7 @@ public class User {
     private List<Hotel> ManagedHotels;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Reservation> reservations = new ArrayList<>();
+    private List<Reservation> reservations;
 
     @ManyToMany
     @JoinTable(
@@ -67,9 +67,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "hotel_id")
     )
-    private List<Hotel> favorites = new ArrayList<>();
+    private List<Hotel> favorites;
 
     public void addFavorite(Hotel hotel) {
+        if (favorites == null) {
+            favorites = new ArrayList<>();
+        }
         favorites.add(hotel);
     }
 
