@@ -50,6 +50,16 @@ public class userController {
         return userService.getFavByUserId(id);
     }
 
+    @GetMapping("/near-hotels/{id}")
+    public List<Hotel> getNearHotels(@PathVariable int id) {
+        return userService.getNearMeHotel(id);
+    }
+
+    @GetMapping("/recommended-hotels/{id}")
+    public List<Hotel> getRecommendedHotels(@PathVariable int id) {
+        return userService.getRecommendedHotels(id);
+    }
+
     @PostMapping("/add-to-fav/{userId}/hotel/{hotelId}")
     public ResponseEntity<?> addHotelToFavorites(@PathVariable int userId, @PathVariable int hotelId) {
         return userService.addHotelToFavorites(userId, hotelId);

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -150,6 +151,33 @@ public class UserServiceImpl implements UserService {
     public List<Hotel> getFavByUserId(int id) {
         User user = userRepo.findById(id).orElseThrow(() -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND));
         return user.getFavorites();
+    }
+
+    @Override
+    public List<Hotel> getNearMeHotel(int id) {
+        // Not real algorithm to get near hotels for user, LoL 😂
+        List<Hotel> hotels = hotelRepo.findAll(), nearHotels = new ArrayList<>();
+        for (Hotel hotel : hotels) {
+            if (nearHotels.size() >= 3) break;
+            boolean done = Math.max((double) (id / 3), hotel.getId()) % Math.min( (double) (id / 3), hotel.getId()) == 0;
+            if ( done ) {
+                nearHotels.add(hotel);
+            }
+        }
+        return nearHotels;
+    }
+
+    @Override
+    public List<Hotel> getRecommendedHotels(int id) {
+        // Not real algorithm to get recommended hotels for user, LoL 😂
+        List<Hotel> hotels = hotelRepo.findAll(), nearHotels = new ArrayList<>();
+        for (Hotel hotel : hotels) {
+            boolean done = Math.max(id, hotel.getId()) % Math.min(id, hotel.getId()) == 0;
+            if ( done ) {
+                nearHotels.add(hotel);
+            }
+        }
+        return nearHotels;
     }
 
     private boolean canBookThisHotel(Hotel hotel) {

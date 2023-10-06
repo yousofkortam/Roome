@@ -19,4 +19,6 @@ public interface UserService {
     ResponseEntity<?> removeHotelFromFavorites(int userId, int hotelId);
     ResponseEntity<?> bookHotel(reservationDto reservation);
     List<Hotel> getFavByUserId(int id);
+    List<Hotel> getNearMeHotel(int id);
+    List<Hotel> getRecommendedHotels(int id);
 }
