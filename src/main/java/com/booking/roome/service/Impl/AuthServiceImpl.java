@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             userRepo.save(user);
         }catch (Exception e) {
-            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse("Validation failed", HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(user);
