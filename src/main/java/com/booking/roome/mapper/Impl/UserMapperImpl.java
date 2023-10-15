@@ -17,6 +17,9 @@ public class UserMapperImpl implements UserMapper {
                 .email(dto.getEmail())
                 .password(dto.getPassword())
                 .profileImage(dto.getProfileImage())
+                .nationality(dto.getNationality())
+                .phoneNumber(dto.getPhoneNumber())
+                .occupation(dto.getOccupation())
                 .build();
     }
 
@@ -31,6 +34,9 @@ public class UserMapperImpl implements UserMapper {
                 .password(user.getPassword())
                 .role_id(user.getRole().getId())
                 .profileImage(user.getProfileImage())
+                .nationality(user.getNationality())
+                .phoneNumber(user.getPhoneNumber())
+                .occupation(user.getOccupation())
                 .build();
     }
 }

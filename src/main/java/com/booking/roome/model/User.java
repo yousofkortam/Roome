@@ -54,6 +54,15 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
+    @Column(name = "nationality")
+    private String nationality;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "occupation")
+    private String occupation;
+
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
     private List<Hotel> ManagedHotels;

@@ -17,4 +17,7 @@ public class userDto {
     private String password;
     private int role_id;
     private String profileImage;
+    private String nationality;
+    private String phoneNumber;
+    private String occupation;
 }
