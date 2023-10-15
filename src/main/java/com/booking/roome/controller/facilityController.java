@@ -6,6 +6,7 @@ import com.booking.roome.service.FacilityService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,13 +31,13 @@ public class facilityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> AddFacility(@Valid @RequestBody facilityDto facility) {
-        return facilityService.addFacility(facility);
+    public ResponseEntity<?> AddFacility(@Valid @RequestPart("facility") facilityDto facility, @RequestPart("icon") MultipartFile icon) {
+        return facilityService.addFacility(facility, icon);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFacility(@Valid @RequestBody facilityDto facilityDto, @PathVariable int id) {
-        return facilityService.updateFacility(facilityDto, id);
+    public ResponseEntity<?> updateFacility(@Valid @RequestPart("facility") facilityDto facilityDto, @RequestPart("icon") MultipartFile icon, @PathVariable int id) {
+        return facilityService.updateFacility(facilityDto, icon, id);
     }
 
     @DeleteMapping("/{id}")

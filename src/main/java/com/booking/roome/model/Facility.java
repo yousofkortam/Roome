@@ -25,6 +25,8 @@ public class Facility {
     @NotNull(message = "Facility name required")
     private String name;
 
+    private String icon;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "facilities")
     private List<Hotel> hotels;
