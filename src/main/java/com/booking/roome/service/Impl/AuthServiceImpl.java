@@ -2,7 +2,6 @@ package com.booking.roome.service.Impl;
 
 import com.booking.roome.dto.loginDto;
 import com.booking.roome.dto.userDto;
-import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.exception.ExceptionResponse;
 import com.booking.roome.mapper.UserMapper;
 import com.booking.roome.model.Role;
@@ -14,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -34,20 +36,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<?> login(loginDto login) {
         String username = login.getUsername(), password = login.getPassword();
-
-        User user = userRepo.getUserByUsernameAndPassword(username, password);
-        if (user != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(user);
-        }
-
-        user = userRepo.getUserByEmailAndPassword(username, password);
-        if (user != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(user);
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ExceptionRequest("Username or password incorrect", HttpStatus.NOT_FOUND.value())
+        User user = userRepo.getUserByUsernameOrEmailAndPassword(username, username, password).orElseThrow(
+                () -> new ExceptionResponse("Invalid username or password", HttpStatus.NOT_FOUND)
         );
+        return ResponseEntity.ok(user);
     }
 
     @Override
@@ -55,12 +47,11 @@ public class AuthServiceImpl implements AuthService {
         if (userRepo.existsByUsername(newUser.getUsername())) throw new ExceptionResponse("Username already in user", HttpStatus.BAD_REQUEST);
         if (userRepo.existsByEmail(newUser.getEmail())) throw new ExceptionResponse("Email already in user", HttpStatus.BAD_REQUEST);
 
-        Role role;
-        if (newUser.getRole_id() == 0) {
-            role = roleRepo.findByName("user");
-        }else {
-            role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
+        if (!isValidEmailFormat(newUser.getEmail())) {
+            throw new ExceptionResponse("Please enter a valid email", HttpStatus.NOT_FOUND);
         }
+
+        Role role = roleRepo.findById(newUser.getRole_id()).orElse(roleRepo.findByName("user"));
 
         User user = userMapper.toEntity(newUser);
         user.setRole(role);
@@ -72,5 +63,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return ResponseEntity.ok(user);
+    }
+
+    private boolean isValidEmailFormat(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }
