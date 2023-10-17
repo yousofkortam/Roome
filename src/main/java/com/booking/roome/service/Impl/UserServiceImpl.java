@@ -52,14 +52,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> addUser(userDto newUser) {
-        SaveUserOrElseThrow(newUser);
+        SaveUserOrElseThrow(newUser, 0);
 
         return ResponseEntity.ok(new ExceptionRequest("User added successfully", HttpStatus.OK.value()));
     }
 
     @Override
-    public ResponseEntity<?> updateUser(userDto updatedUser) {
-        SaveUserOrElseThrow(updatedUser);
+    public ResponseEntity<?> updateUser(userDto updatedUser, int id) {
+        SaveUserOrElseThrow(updatedUser, id);
 
         return ResponseEntity.ok(new ExceptionRequest("User updated successfully", HttpStatus.OK.value()));
     }
@@ -186,30 +186,49 @@ public class UserServiceImpl implements UserService {
         return numberOfReservation < totalNumberOfRooms;
     }
 
-    int isUserExist(String username, String email) {
-        if (userRepo.existsByUsername(username)) return 1;
-        if (userRepo.existsByEmail(email)) return 2;
-        return 3;
+    private boolean isEmailInUse(String email) {
+        return userRepo.existsByEmail(email);
     }
 
-    private void SaveUserOrElseThrow(userDto newUser) {
-        int isExist = isUserExist(newUser.getUsername(), newUser.getEmail());
-        if (isExist == 1) throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
-        if (isExist == 2) throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
+    private boolean isUsernameInUse(String username) {
+        return userRepo.existsByUsername(username);
+    }
 
+    private void SaveUserOrElseThrow(userDto newUser, int id) {
+        if (id != 0) {
+            User existUser = userRepo.findById(id).orElseThrow(
+                    () -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND)
+            );
+            if (!newUser.getEmail().equals(existUser.getEmail()) && isEmailInUse(newUser.getEmail())) {
+                throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
+            }
+
+            if (!newUser.getUsername().equals(existUser.getUsername()) && isUsernameInUse(newUser.getUsername())) {
+                throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
+            }
+        }else {
+            if (isEmailInUse(newUser.getEmail())) {
+                throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
+            }
+
+            if (isUsernameInUse(newUser.getUsername())) {
+                throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
+            }
+        }
         Role role = roleRepo.findById(newUser.getRole_id()).orElse(null);
         if (role == null) {
             role = roleRepo.findByName("user");
-        }else {
+        } else {
             role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
         }
 
         User user = userMapper.toEntity(newUser);
+        user.setId(id);
         user.setRole(role);
 
         try {
             userRepo.save(user);
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

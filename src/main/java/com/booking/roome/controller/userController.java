@@ -35,9 +35,9 @@ public class userController {
         return userService.addUser(user);
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateUser(@Valid @RequestBody userDto user) {
-        return userService.updateUser(user);
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody userDto user, @PathVariable int id) {
+        return userService.updateUser(user, id);
     }
 
     @DeleteMapping("/{id}")

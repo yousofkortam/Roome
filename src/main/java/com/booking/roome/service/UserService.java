@@ -13,7 +13,7 @@ public interface UserService {
     List<User> users();
     ResponseEntity<?> getUser(int id);
     ResponseEntity<?> addUser(userDto newUser);
-    ResponseEntity<?> updateUser(userDto updatedUser);
+    ResponseEntity<?> updateUser(userDto updatedUser, int id);
     ResponseEntity<?> deleteUser(int id);
     ResponseEntity<?> addHotelToFavorites(int userId, int hotelId);
     ResponseEntity<?> removeHotelFromFavorites(int userId, int hotelId);
