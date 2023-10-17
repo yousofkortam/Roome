@@ -59,9 +59,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> updateUser(userDto updatedUser, int id) {
-        SaveUserOrElseThrow(updatedUser, id);
-
-        return ResponseEntity.ok(new ExceptionRequest("User updated successfully", HttpStatus.OK.value()));
+        User user = SaveUserOrElseThrow(updatedUser, id);
+        return ResponseEntity.ok(user);
     }
 
     @Override
@@ -194,7 +193,7 @@ public class UserServiceImpl implements UserService {
         return userRepo.existsByUsername(username);
     }
 
-    private void SaveUserOrElseThrow(userDto newUser, int id) {
+    private User SaveUserOrElseThrow(userDto newUser, int id) {
         if (id != 0) {
             User existUser = userRepo.findById(id).orElseThrow(
                     () -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND)
@@ -226,6 +225,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+        return user;
     }
 
 }
