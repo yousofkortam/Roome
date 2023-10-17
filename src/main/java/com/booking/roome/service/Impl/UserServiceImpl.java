@@ -215,12 +215,7 @@ public class UserServiceImpl implements UserService {
                 throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
             }
         }
-        Role role = roleRepo.findById(newUser.getRole_id()).orElse(null);
-        if (role == null) {
-            role = roleRepo.findByName("user");
-        } else {
-            role = roleRepo.findById(newUser.getRole_id()).orElseThrow(() -> new ExceptionResponse("Role not found", HttpStatus.NOT_FOUND));
-        }
+        Role role = roleRepo.findById(newUser.getRole_id()).orElse(roleRepo.findByName("user"));
 
         User user = userMapper.toEntity(newUser);
         user.setId(id);
