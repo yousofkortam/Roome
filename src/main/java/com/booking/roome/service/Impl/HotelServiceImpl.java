@@ -93,9 +93,7 @@ public class HotelServiceImpl implements HotelService {
         for (MultipartFile file : File) {
             try {
 
-                String originalFilename = file.getOriginalFilename();
-                String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
-                String filename = (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
+                String filename = getUniqueFileName(file);
 
                 byte[] bytes = file.getBytes();
                 Path path = Paths.get(UPLOADED_FOLDER + filename);
@@ -111,6 +109,12 @@ public class HotelServiceImpl implements HotelService {
         }
         imageRepository.saveAll(images);
         return images;
+    }
+
+    private String getUniqueFileName(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
+        return (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
     }
 
     @Override

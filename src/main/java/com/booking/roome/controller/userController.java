@@ -8,6 +8,7 @@ import com.booking.roome.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class userController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody userDto user, @PathVariable int id) {
-        return userService.updateUser(user, id);
+    public ResponseEntity<?> updateUser(@Valid @RequestPart("user") userDto user, @PathVariable int id, @RequestPart("profile_image")MultipartFile profileImage) {
+        return userService.updateUser(user, id, profileImage);
     }
 
     @DeleteMapping("/{id}")

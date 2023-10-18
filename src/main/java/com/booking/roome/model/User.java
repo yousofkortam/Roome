@@ -51,8 +51,9 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @Column(name = "profile_image")
-    private String profileImage;
+    @OneToOne
+    @JoinColumn(name = "profile_image_id")
+    private Image profileImage;
 
     @Column(name = "nationality")
     private String nationality;

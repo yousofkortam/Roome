@@ -12,8 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -23,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepo;
     private final HotelRepository hotelRepo;
     private final ReservationRepository reservationRepository;
+    private final ImageRepository imageRepository;
     private final UserMapper userMapper;
 
     @Autowired
@@ -30,12 +36,14 @@ public class UserServiceImpl implements UserService {
                            RoleRepository roleRepo,
                            HotelRepository hotelRepo,
                            ReservationRepository reservationRepository,
-                           UserMapper userMapper) {
+                           UserMapper userMapper,
+                           ImageRepository imageRepository) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.hotelRepo = hotelRepo;
         this.reservationRepository = reservationRepository;
         this.userMapper = userMapper;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -50,16 +58,62 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(user);
     }
 
+    Role getRole(int id) {
+        return roleRepo.findById(id).orElse(roleRepo.findByName("user"));
+    }
+
     @Override
     public ResponseEntity<?> addUser(userDto newUser) {
-        SaveUserOrElseThrow(newUser, 0);
+        if (isEmailInUse(newUser.getEmail())) {
+            throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
+        }
+        if (isUsernameInUse(newUser.getUsername())) {
+            throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
+        }
+
+        Role role = getRole(newUser.getRole_id());
+
+        User user = userMapper.toEntity(newUser);
+        user.setRole(role);
+
+        try {
+            userRepo.save(user);
+        } catch (Exception e) {
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
         return ResponseEntity.ok(new ExceptionRequest("User added successfully", HttpStatus.OK.value()));
     }
 
     @Override
-    public ResponseEntity<?> updateUser(userDto updatedUser, int id) {
-        User user = SaveUserOrElseThrow(updatedUser, id);
+    public ResponseEntity<?> updateUser(userDto updatedUser, int id, MultipartFile profileImage) {
+        User existUser = userRepo.findById(id).orElseThrow(
+                () -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND)
+        );
+        if (!updatedUser.getEmail().equals(existUser.getEmail()) && isEmailInUse(updatedUser.getEmail())) {
+            throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!updatedUser.getUsername().equals(existUser.getUsername()) && isUsernameInUse(updatedUser.getUsername())) {
+            throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
+        }
+        Role role = getRole(updatedUser.getRole_id());
+
+        User user = userMapper.toEntity(updatedUser);
+        user.setId(id);
+        user.setRole(role);
+        user.setManagedHotels(existUser.getManagedHotels());
+        user.setFavorites(existUser.getFavorites());
+        user.setReservations(existUser.getReservations());
+
+        Image image = uploadImage(profileImage);
+        user.setProfileImage(image);
+
+        try {
+            userRepo.save(user);
+        } catch (Exception e) {
+            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
         return ResponseEntity.ok(user);
     }
 
@@ -193,39 +247,33 @@ public class UserServiceImpl implements UserService {
         return userRepo.existsByUsername(username);
     }
 
-    private User SaveUserOrElseThrow(userDto newUser, int id) {
-        if (id != 0) {
-            User existUser = userRepo.findById(id).orElseThrow(
-                    () -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND)
-            );
-            if (!newUser.getEmail().equals(existUser.getEmail()) && isEmailInUse(newUser.getEmail())) {
-                throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
-            }
-
-            if (!newUser.getUsername().equals(existUser.getUsername()) && isUsernameInUse(newUser.getUsername())) {
-                throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
-            }
-        }else {
-            if (isEmailInUse(newUser.getEmail())) {
-                throw new ExceptionResponse("Email already in use", HttpStatus.BAD_REQUEST);
-            }
-
-            if (isUsernameInUse(newUser.getUsername())) {
-                throw new ExceptionResponse("Username already in use", HttpStatus.BAD_REQUEST);
-            }
-        }
-        Role role = roleRepo.findById(newUser.getRole_id()).orElse(roleRepo.findByName("user"));
-
-        User user = userMapper.toEntity(newUser);
-        user.setId(id);
-        user.setRole(role);
+    private Image uploadImage(MultipartFile File) {
+        String UPLOADED_FOLDER = "src/main/resources/static/images/";
 
         try {
-            userRepo.save(user);
+
+            String filename = getUniqueFileName(File);
+
+            byte[] bytes = File.getBytes();
+            Path path = Paths.get(UPLOADED_FOLDER + filename);
+            Files.write(path, bytes);
+
+            Image image = new Image();
+            image.setPath(filename); image.setName(File.getOriginalFilename());
+
+            imageRepository.save(image);
+
+            return image;
+
         } catch (Exception e) {
-            throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new ExceptionResponse("Failed to upload file", HttpStatus.BAD_REQUEST);
         }
-        return user;
+    }
+
+    private String getUniqueFileName(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
+        return (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
     }
 
 }
