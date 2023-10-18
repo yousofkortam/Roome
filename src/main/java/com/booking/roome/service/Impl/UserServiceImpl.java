@@ -12,13 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,7 +22,6 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepo;
     private final HotelRepository hotelRepo;
     private final ReservationRepository reservationRepository;
-    private final ImageRepository imageRepository;
     private final UserMapper userMapper;
 
     @Autowired
@@ -36,14 +29,12 @@ public class UserServiceImpl implements UserService {
                            RoleRepository roleRepo,
                            HotelRepository hotelRepo,
                            ReservationRepository reservationRepository,
-                           UserMapper userMapper,
-                           ImageRepository imageRepository) {
+                           UserMapper userMapper) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.hotelRepo = hotelRepo;
         this.reservationRepository = reservationRepository;
         this.userMapper = userMapper;
-        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -86,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> updateUser(userDto updatedUser, int id, MultipartFile profileImage) {
+    public ResponseEntity<?> updateUser(userDto updatedUser, int id) {
         User existUser = userRepo.findById(id).orElseThrow(
                 () -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND)
         );
@@ -105,9 +96,6 @@ public class UserServiceImpl implements UserService {
         user.setManagedHotels(existUser.getManagedHotels());
         user.setFavorites(existUser.getFavorites());
         user.setReservations(existUser.getReservations());
-
-        Image image = uploadImage(profileImage);
-        user.setProfileImage(image);
 
         try {
             userRepo.save(user);
@@ -245,35 +233,6 @@ public class UserServiceImpl implements UserService {
 
     private boolean isUsernameInUse(String username) {
         return userRepo.existsByUsername(username);
-    }
-
-    private Image uploadImage(MultipartFile File) {
-        String UPLOADED_FOLDER = "src/main/resources/static/images/";
-
-        try {
-
-            String filename = getUniqueFileName(File);
-
-            byte[] bytes = File.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + filename);
-            Files.write(path, bytes);
-
-            Image image = new Image();
-            image.setPath(filename); image.setName(File.getOriginalFilename());
-
-            imageRepository.save(image);
-
-            return image;
-
-        } catch (Exception e) {
-            throw new ExceptionResponse("Failed to upload file", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    private String getUniqueFileName(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
-        return (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
     }
 
 }
