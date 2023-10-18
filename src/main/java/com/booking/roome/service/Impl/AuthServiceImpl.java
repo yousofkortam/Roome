@@ -36,9 +36,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<?> login(loginDto login) {
         String username = login.getUsername(), password = login.getPassword();
-        User user = userRepo.getUserByUsernameOrEmailAndPassword(username, username, password).orElseThrow(
-                () -> new ExceptionResponse("Invalid username or password", HttpStatus.NOT_FOUND)
-        );
+        User user = userRepo.getUserByUsernameAndPassword(username, password);
+        if (user == null) {
+            user = userRepo.getUserByEmailAndPassword(username, password);
+        }
+
+        if (user == null) {
+            throw new ExceptionResponse("Invalid username or password", HttpStatus.NOT_FOUND);
+        }
+
         return ResponseEntity.ok(user);
     }
 
