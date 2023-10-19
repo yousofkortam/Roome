@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
             user = userRepo.getUserByEmailAndPassword(username, password);
         }
 
-        if (user == null) {
+        if (user == null || !user.isActive()) {
             throw new ExceptionResponse("Invalid username or password", HttpStatus.NOT_FOUND);
         }
 

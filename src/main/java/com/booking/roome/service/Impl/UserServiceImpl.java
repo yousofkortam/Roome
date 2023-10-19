@@ -39,12 +39,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> users() {
-        return userRepo.findAll();
+        return userRepo.getAllByActive(true);
     }
 
     @Override
     public ResponseEntity<?> getUser(int id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND));
+        User user = userRepo.getUserByIdAndActive(id, true).orElseThrow(() -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND));
 
         return ResponseEntity.ok(user);
     }
@@ -66,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(newUser);
         user.setRole(role);
+        user.setActive(true);
 
         try {
             userRepo.save(user);
@@ -109,8 +110,10 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> deleteUser(int id) {
         User user = userRepo.findById(id).orElseThrow(() -> new ExceptionResponse("User not found", HttpStatus.NOT_FOUND));
 
+        user.setActive(false);
+
         try {
-            userRepo.delete(user);
+            userRepo.save(user);
         }catch (Exception e) {
             throw new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

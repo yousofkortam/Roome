@@ -63,6 +63,9 @@ public class User {
     @Column(name = "occupation")
     private String occupation;
 
+    @Column(name = "active")
+    private boolean active;
+
     @JsonIgnore
     @OneToMany(mappedBy = "admin")
     private List<Hotel> ManagedHotels;
