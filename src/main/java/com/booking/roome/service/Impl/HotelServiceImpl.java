@@ -100,7 +100,8 @@ public class HotelServiceImpl implements HotelService {
                 Files.write(path, bytes);
 
                 Image image = new Image();
-                image.setPath(filename); image.setName(file.getOriginalFilename());
+                image.setPath(filename);
+                image.setName(file.getOriginalFilename());
                 images.add(image);
 
             } catch (Exception e) {
