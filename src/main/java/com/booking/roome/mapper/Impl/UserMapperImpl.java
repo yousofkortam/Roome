@@ -19,6 +19,7 @@ public class UserMapperImpl implements UserMapper {
                 .nationality(dto.getNationality())
                 .phoneNumber(dto.getPhoneNumber())
                 .occupation(dto.getOccupation())
+                .profileImage(dto.getProfileImage())
                 .build();
     }
 
@@ -35,6 +36,7 @@ public class UserMapperImpl implements UserMapper {
                 .nationality(user.getNationality())
                 .phoneNumber(user.getPhoneNumber())
                 .occupation(user.getOccupation())
+                .profileImage(user.getProfileImage())
                 .build();
     }
 }
