@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntity(updatedUser);
         user.setId(id);
         user.setRole(role);
+        user.setActive(true);
         user.setManagedHotels(existUser.getManagedHotels());
         user.setFavorites(existUser.getFavorites());
         user.setReservations(existUser.getReservations());
