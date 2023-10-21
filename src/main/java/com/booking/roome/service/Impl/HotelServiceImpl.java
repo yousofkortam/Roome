@@ -10,17 +10,14 @@ import com.booking.roome.model.Image;
 import com.booking.roome.model.User;
 import com.booking.roome.repository.*;
 import com.booking.roome.service.HotelService;
+import com.booking.roome.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,6 +29,8 @@ public class HotelServiceImpl implements HotelService {
     private final HotelMapper hotelMapper;
     private final ImageRepository imageRepository;
 
+    private final UploadFileService uploadFileService;
+
 
 
     @Autowired
@@ -39,12 +38,13 @@ public class HotelServiceImpl implements HotelService {
                             UserRepository userRepository,
                             FacilityRepository facilityRepository,
                             HotelMapper hotelMapper,
-                            ImageRepository imageRepository) {
+                            ImageRepository imageRepository, UploadFileService uploadFileService) {
         this.hotelRepository = hotelRepository;
         this.userRepository = userRepository;
         this.facilityRepository = facilityRepository;
         this.hotelMapper = hotelMapper;
         this.imageRepository = imageRepository;
+        this.uploadFileService = uploadFileService;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public ResponseEntity<?> addHotel(hotelDto hotel, MultipartFile[] File) {
+    public ResponseEntity<?> addHotel(hotelDto hotel, MultipartFile[] Files) {
         User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
 
         Hotel newHotel = hotelMapper.toEntity(hotel);
@@ -71,11 +71,7 @@ public class HotelServiceImpl implements HotelService {
             newHotel.addFacility(facility);
         }
 
-        List<Image> images = uploadImage(File);
-
-        if (!images.isEmpty()) {
-            newHotel.addAllImages(images);
-        }
+        UploadImages(Files, newHotel);
 
         try {
             hotelRepository.save(newHotel);
@@ -86,40 +82,8 @@ public class HotelServiceImpl implements HotelService {
         return ResponseEntity.status(HttpStatus.OK).body(newHotel);
     }
 
-    private List<Image> uploadImage(MultipartFile[] File) {
-        String UPLOADED_FOLDER = "src/main/resources/static/images/";
-        List<Image> images = new ArrayList<>();
-
-        for (MultipartFile file : File) {
-            try {
-
-                String filename = getUniqueFileName(file);
-
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(UPLOADED_FOLDER + filename);
-                Files.write(path, bytes);
-
-                Image image = new Image();
-                image.setPath(filename);
-                image.setName(file.getOriginalFilename());
-                images.add(image);
-
-            } catch (Exception e) {
-                throw new ExceptionResponse("Failed to upload file", HttpStatus.BAD_REQUEST);
-            }
-        }
-        imageRepository.saveAll(images);
-        return images;
-    }
-
-    private String getUniqueFileName(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf('.')) : null;
-        return (originalFilename != null ? originalFilename.substring(0, originalFilename.lastIndexOf('.')) : null) + new Date().getTime() + extension;
-    }
-
     @Override
-    public ResponseEntity<?> updateHotel(hotelDto hotel, int id, MultipartFile[] files) {
+    public ResponseEntity<?> updateHotel(hotelDto hotel, int id, MultipartFile[] Files) {
         Hotel oldHotel = hotelRepository.findById(id).orElseThrow(() -> new ExceptionResponse("Hotel not found", HttpStatus.NOT_FOUND));
 
         User admin = userRepository.findById(hotel.getAdmin_id()).orElseThrow(() -> new ExceptionResponse("Admin not found", HttpStatus.NOT_FOUND));
@@ -132,8 +96,7 @@ public class HotelServiceImpl implements HotelService {
         oldHotel.setPrice(hotel.getPrice());
         oldHotel.setNumberRooms(hotel.getNumberRooms());
 
-        List<Image> images = uploadImage(files);
-        oldHotel.setImages(images);
+        UploadImages(Files, oldHotel);
 
         List<Facility> facilities = facilityRepository.findAllById(hotel.getFacilities());
 
@@ -146,6 +109,27 @@ public class HotelServiceImpl implements HotelService {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(oldHotel);
+    }
+
+    private void UploadImages(MultipartFile[] Files, Hotel hotel) {
+        if (Files.length > 0) {
+            List<Image> images = new ArrayList<>();
+            for (MultipartFile file : Files) {
+                String imageUrl = uploadFileService.uploadFile(file);
+                images.add(
+                        new Image(
+                                file.getOriginalFilename(),
+                                imageUrl
+                        )
+                );
+            }
+            try {
+                imageRepository.saveAll(images);
+                hotel.setImages(images);
+            }catch (Exception e) {
+                throw new ExceptionResponse("Cannot upload images", HttpStatus.BAD_REQUEST);
+            }
+        }
     }
 
     @Override

@@ -17,4 +17,9 @@ public class Image {
     private int id;
     private String name;
     private String path;
+
+    public Image(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
 }
