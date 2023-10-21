@@ -4,9 +4,9 @@ import com.booking.roome.dto.facilityDto;
 import com.booking.roome.exception.ExceptionResponse;
 import com.booking.roome.exception.ExceptionRequest;
 import com.booking.roome.model.Facility;
-import com.booking.roome.model.Image;
 import com.booking.roome.repository.FacilityRepository;
 import com.booking.roome.service.FacilityService;
+import com.booking.roome.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +16,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class FacilityServiceImpl implements FacilityService {
     private final FacilityRepository facilityRepository;
+    private final UploadFileService uploadFileService;
 
     @Autowired
-    public FacilityServiceImpl(FacilityRepository facilityRepository) {
+    public FacilityServiceImpl(FacilityRepository facilityRepository, UploadFileService uploadFileService) {
         this.facilityRepository = facilityRepository;
+        this.uploadFileService = uploadFileService;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class FacilityServiceImpl implements FacilityService {
     public ResponseEntity<?> addFacility(facilityDto facility, MultipartFile icon) {
         Facility newFacility = new Facility();
         newFacility.setName(facility.getName());
-        String iconName = icon.isEmpty() ? null : uploadIcon(icon);
+        String iconName = icon.isEmpty() ? null : uploadFileService.uploadFile(icon);
         newFacility.setIcon(iconName);
 
         try {

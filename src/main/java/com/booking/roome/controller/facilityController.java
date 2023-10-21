@@ -31,7 +31,7 @@ public class facilityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> AddFacility(@Valid @RequestPart("facility") facilityDto facility, @RequestPart("icon") MultipartFile icon) {
+    public ResponseEntity<?> addFacility(@Valid @RequestPart("facility") facilityDto facility, @RequestPart("icon") MultipartFile icon) {
         return facilityService.addFacility(facility, icon);
     }
 
