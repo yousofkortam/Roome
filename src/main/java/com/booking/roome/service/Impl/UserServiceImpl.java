@@ -203,11 +203,8 @@ public class UserServiceImpl implements UserService {
         // Not real algorithm to get near hotels for user, LoL 😂
         List<Hotel> hotels = hotelRepo.findAll(), nearHotels = new ArrayList<>();
         for (Hotel hotel : hotels) {
-            if (nearHotels.size() >= 3) break;
-            boolean done = Math.max((double) (id / 3), hotel.getId()) % Math.min( (double) (id / 3), hotel.getId()) == 0;
-            if ( done ) {
-                nearHotels.add(hotel);
-            }
+            if (nearHotels.size() > 4) break;
+            nearHotels.add(hotel);
         }
         return nearHotels;
     }
