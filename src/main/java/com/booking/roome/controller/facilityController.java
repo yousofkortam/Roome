@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/facility")
+@RequestMapping("facilities")
 public class facilityController {
 
     private final FacilityService facilityService;
@@ -23,7 +23,7 @@ public class facilityController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public Facility getFacility(@PathVariable int id) {
         return facilityService.getFacility(id);
     }
@@ -33,12 +33,12 @@ public class facilityController {
         return facilityService.addFacility(facility, icon);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public Facility updateFacility(@Valid @RequestPart("facility") facilityDto facilityDto, @RequestPart("icon") MultipartFile icon, @PathVariable int id) {
         return facilityService.updateFacility(facilityDto, icon, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteFacility(@PathVariable int id) {
         facilityService.deleteFacility(id);
     }

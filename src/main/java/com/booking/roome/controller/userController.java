@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("users")
 public class userController {
     private final UserService userService;
 
@@ -25,7 +25,7 @@ public class userController {
         return userService.users();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public User getUser(@PathVariable int id) {
         return userService.getUser(id);
     }
@@ -40,37 +40,37 @@ public class userController {
         return userService.updateUser(user, id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
     }
 
-    @GetMapping("/fav/{id}")
+    @GetMapping("fav/{id}")
     public List<Hotel> getFavoritesByUserId(@PathVariable int id) {
         return userService.getFavByUserId(id);
     }
 
-    @GetMapping("/near-hotels/{id}")
+    @GetMapping("near-hotels/{id}")
     public List<Hotel> getNearHotels(@PathVariable int id) {
         return userService.getNearMeHotel(id);
     }
 
-    @GetMapping("/recommended-hotels/{id}")
+    @GetMapping("recommended-hotels/{id}")
     public List<Hotel> getRecommendedHotels(@PathVariable int id) {
         return userService.getRecommendedHotels(id);
     }
 
-    @PostMapping("/add-to-fav/{userId}/hotel/{hotelId}")
+    @PostMapping("add-to-fav/{userId}/hotel/{hotelId}")
     public ResponseEntity<?> addHotelToFavorites(@PathVariable int userId, @PathVariable int hotelId) {
         return userService.addHotelToFavorites(userId, hotelId);
     }
 
-    @PostMapping("/remove-from-fav/{userId}/hotel/{hotelId}")
+    @PostMapping("remove-from-fav/{userId}/hotel/{hotelId}")
     public ResponseEntity<?> removeHotelFromFavorites(@PathVariable int userId, @PathVariable int hotelId) {
         return userService.removeHotelFromFavorites(userId, hotelId);
     }
 
-    @PostMapping("/book-hotel")
+    @PostMapping("book-hotel")
     public ResponseEntity<?> bookHotel(@RequestBody reservationDto reservation) {
         return userService.bookHotel(reservation);
     }

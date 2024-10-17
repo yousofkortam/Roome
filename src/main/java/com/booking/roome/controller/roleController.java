@@ -12,12 +12,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("role")
+@RequestMapping("roles")
 public class roleController {
 
     private final RoleService roleService;
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public Role getRole(@PathVariable int id) {
         return roleService.getRole(id);
     }
@@ -32,12 +32,12 @@ public class roleController {
         return roleService.add(newRole);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<?> updateRole(@Valid @RequestBody Role role, @PathVariable int id) {
         return ResponseEntity.ok(roleService.update(role, id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteRole(@PathVariable int id) {
         roleService.delete(id);
     }

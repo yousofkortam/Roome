@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("hotel")
+@RequestMapping("hotels")
 public class hotelController {
 
     private final HotelService hotelService;
@@ -21,7 +21,7 @@ public class hotelController {
         this.hotelService = hotelService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public Hotel getHotel(@PathVariable int id) {
         return hotelService.getHotel(id);
     }
@@ -36,17 +36,17 @@ public class hotelController {
         return hotelService.addHotel(hotel, files);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public Hotel updateHotel(@Valid @RequestPart("hotel") hotelDto hotel, @PathVariable int id, @RequestPart("files") MultipartFile[] files) {
         return hotelService.updateHotel(hotel, id, files);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteHotel(@PathVariable int id) {
         hotelService.deleteHotel(id);
     }
 
-    @GetMapping("/search/{name}")
+    @GetMapping("search/{name}")
     public List<Hotel> searchHotel(@PathVariable String name) {
         return hotelService.search(name);
     }
