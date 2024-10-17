@@ -1,40 +1,28 @@
-package com.booking.roome.service.Impl;
+package com.booking.roome.service.auth;
 
 import com.booking.roome.dto.loginDto;
 import com.booking.roome.dto.userDto;
-import com.booking.roome.exception.ExceptionResponse;
 import com.booking.roome.mapper.UserMapper;
 import com.booking.roome.model.Role;
 import com.booking.roome.model.User;
 import com.booking.roome.repository.RoleRepository;
 import com.booking.roome.repository.UserRepository;
-import com.booking.roome.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final UserMapper userMapper;
 
-    @Autowired
-    public AuthServiceImpl(UserRepository userRepo,
-                           UserMapper userMapper,
-                           RoleRepository roleRepo) {
-        this.userRepo = userRepo;
-        this.userMapper = userMapper;
-        this.roleRepo = roleRepo;
-    }
-
     @Override
-    public ResponseEntity<?> login(loginDto login) {
+    public User login(loginDto login) {
         String username = login.getUsername(), password = login.getPassword();
         User user = userRepo.getUserByUsernameAndPassword(username, password);
         if (user == null) {
@@ -42,19 +30,19 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (user == null || !user.isActive()) {
-            throw new ExceptionResponse("Invalid username or password", HttpStatus.NOT_FOUND);
+            throw new IllegalArgumentException("Invalid username or password");
         }
 
-        return ResponseEntity.ok(user);
+        return user;
     }
 
     @Override
-    public ResponseEntity<?> register(userDto newUser) {
-        if (userRepo.existsByUsername(newUser.getUsername())) throw new ExceptionResponse("Username already in user", HttpStatus.BAD_REQUEST);
-        if (userRepo.existsByEmail(newUser.getEmail())) throw new ExceptionResponse("Email already in user", HttpStatus.BAD_REQUEST);
+    public User register(userDto newUser) {
+        if (userRepo.existsByUsername(newUser.getUsername())) throw new IllegalArgumentException("Username already in user");
+        if (userRepo.existsByEmail(newUser.getEmail())) throw new IllegalArgumentException("Email already in user");
 
         if (!isValidEmailFormat(newUser.getEmail())) {
-            throw new ExceptionResponse("Please enter a valid email", HttpStatus.NOT_FOUND);
+            throw new IllegalArgumentException("Please enter a valid email");
         }
 
         Role role = roleRepo.findById(newUser.getRole_id()).orElse(roleRepo.findByName("user"));
@@ -63,13 +51,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(role);
         user.setActive(true);
 
-        try {
-            userRepo.save(user);
-        }catch (Exception e) {
-            throw new ExceptionResponse("Validation failed", HttpStatus.BAD_REQUEST);
-        }
-
-        return ResponseEntity.ok(user);
+        return userRepo.save(user);
     }
 
     private boolean isValidEmailFormat(String email) {

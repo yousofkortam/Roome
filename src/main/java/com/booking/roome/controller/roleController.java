@@ -2,26 +2,23 @@ package com.booking.roome.controller;
 
 import com.booking.roome.dto.roleDto;
 import com.booking.roome.model.Role;
-import com.booking.roome.service.RoleService;
+import com.booking.roome.service.role.RoleService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("role")
 public class roleController {
+
     private final RoleService roleService;
 
-    @Autowired
-    public roleController(RoleService roleService) {
-        this.roleService = roleService;
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRole(@PathVariable int id) {
+    public Role getRole(@PathVariable int id) {
         return roleService.getRole(id);
     }
 
@@ -31,7 +28,7 @@ public class roleController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addRole(@Valid @RequestBody roleDto newRole) {
+    public Role addRole(@Valid @RequestBody roleDto newRole) {
         return roleService.add(newRole);
     }
 
@@ -41,8 +38,8 @@ public class roleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRole(@PathVariable int id) {
-        return roleService.delete(id);
+    public void deleteRole(@PathVariable int id) {
+        roleService.delete(id);
     }
 
 }

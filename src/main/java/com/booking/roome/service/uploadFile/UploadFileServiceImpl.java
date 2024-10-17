@@ -1,6 +1,5 @@
-package com.booking.roome.service.Impl;
+package com.booking.roome.service.uploadFile;
 
-import com.booking.roome.service.UploadFileService;
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

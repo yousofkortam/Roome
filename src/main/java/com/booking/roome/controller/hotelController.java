@@ -2,10 +2,9 @@ package com.booking.roome.controller;
 
 import com.booking.roome.dto.hotelDto;
 import com.booking.roome.model.Hotel;
-import com.booking.roome.service.HotelService;
+import com.booking.roome.service.hotel.HotelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("hotel")
 public class hotelController {
+
     private final HotelService hotelService;
 
     @Autowired
@@ -22,7 +22,7 @@ public class hotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getHotel(@PathVariable int id) {
+    public Hotel getHotel(@PathVariable int id) {
         return hotelService.getHotel(id);
     }
 
@@ -32,18 +32,18 @@ public class hotelController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addHotel(@Valid @RequestPart("hotel") hotelDto hotel, @RequestPart("files") MultipartFile[] files) {
+    public Hotel addHotel(@Valid @RequestPart("hotel") hotelDto hotel, @RequestPart("files") MultipartFile[] files) {
         return hotelService.addHotel(hotel, files);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHotel(@Valid @RequestPart("hotel") hotelDto hotel, @PathVariable int id, @RequestPart("files") MultipartFile[] files) {
+    public Hotel updateHotel(@Valid @RequestPart("hotel") hotelDto hotel, @PathVariable int id, @RequestPart("files") MultipartFile[] files) {
         return hotelService.updateHotel(hotel, id, files);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHotel(@PathVariable int id) {
-        return hotelService.deleteHotel(id);
+    public void deleteHotel(@PathVariable int id) {
+        hotelService.deleteHotel(id);
     }
 
     @GetMapping("/search/{name}")

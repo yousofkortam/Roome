@@ -4,7 +4,7 @@ import com.booking.roome.dto.reservationDto;
 import com.booking.roome.dto.userDto;
 import com.booking.roome.model.Hotel;
 import com.booking.roome.model.User;
-import com.booking.roome.service.UserService;
+import com.booking.roome.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,23 +26,23 @@ public class userController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable int id) {
+    public User getUser(@PathVariable int id) {
         return userService.getUser(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> addUser(@Valid @RequestBody userDto user) {
+    public User addUser(@Valid @RequestBody userDto user) {
         return userService.addUser(user);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@Valid @RequestBody userDto user, @PathVariable int id) {
+    public User updateUser(@Valid @RequestBody userDto user, @PathVariable int id) {
         return userService.updateUser(user, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id) {
-        return userService.deleteUser(id);
+    public void deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
     }
 
     @GetMapping("/fav/{id}")
